@@ -28,9 +28,13 @@ def read_original_sentences(original_sentence_file):
 def read_parallel_articles(parallel_articles_file):
     with open(parallel_articles_file, "rt") as f:
         parallel_articles = f.read()
-        parallel_articles = parallel_articles.split("|||")
+        parallel_articles = parallel_articles.split("|||\n")
+
         parallel_hits = [article.split("\n")[0] for article in parallel_articles]
-        parallel_articles = [" ".join(article.split("\n")[1:]) for article in parallel_articles]
+        print(parallel_hits[:1000])
+        input()
+        parallel_articles = [article.split("\n")[1:] for article in parallel_articles]
+        parallel_articles = [" ".join(article) for article in parallel_articles]
     
     return parallel_hits, parallel_articles[:-1] # Last one is empty
 
@@ -96,7 +100,7 @@ if __name__ == "__main__":
     argument_parser.add_argument("--source-sentences", help="Original source language sentences file")
     argument_parser.add_argument("--target-sentences", help="Original target language sentences file")
     argument_parser.add_argument("--parallel-source-articles", help="File with parallel source articles")
-    argument_parser.add_argument("--parallel-target-article", help="File with parallel target articles")
+    argument_parser.add_argument("--parallel-target-articles", help="File with parallel target articles")
     argument_parser.add_argument("--output", help="Output file")
     arguments = argument_parser.parse_args()
 
@@ -107,7 +111,7 @@ if __name__ == "__main__":
     parallel_source_articles_file = arguments.parallel_source_articles
     parallel_target_articles_file = arguments.parallel_target_articles
     output = arguments.output
-
+    """
     source_original_sentences = read_original_sentences(source_original_file)
     target_original_sentences = read_original_sentences(target_original_file)
     print("Original sentences read.")
@@ -119,9 +123,13 @@ if __name__ == "__main__":
     source_sentence_dict = get_sentence_dict(source_original_sentences, source_embeddings)
     target_sentence_dict = get_sentence_dict(target_original_sentences, target_embeddings)
     print("Sentence dictionaries created.")
-
+    """
     parallel_source_hits, parallel_source_articles = read_parallel_articles(parallel_source_articles_file)
     parallel_target_hits, parallel_target_articles = read_parallel_articles(parallel_target_articles_file)
+    print(parallel_source_articles[3])
+    print()
+    print(parallel_source_hits[3])
+    """
     print("Parallel articles read.")
     print("{} parallel articles.".format(len(parallel_source_articles))) 
     print("Calculating cosine similarities...")
@@ -139,4 +147,4 @@ if __name__ == "__main__":
     
     print("Writing results to file...")
     write_to_output_file(sorted_parallel_articles, output)
-
+    """
