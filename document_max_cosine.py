@@ -24,13 +24,15 @@ def read_original_sentences(original_sentence_file):
     original_sentences = [sentence.strip() for sentence in original_sentences]
     return original_sentences
 
+# TODO 
 def read_parallel_articles(parallel_articles_file):
     with open(parallel_articles_file, "rt") as f:
         parallel_articles = f.read()
-        parallel_articles = parallel_articles.split("@@@")
-        parallel_articles = [article.strip() for article in parallel_articles]
-    parallel_articles = [article.split("|||") for article in parallel_articles]
-    return parallel_articles[:-1] # Last one is empty
+        parallel_articles = parallel_articles.split("|||")
+        parallel_hits = [article.split("\n")[0] for article in parallel_articles]
+        parallel_articles = [" ".join(article.split("\n")[1:]) for article in parallel_articles]
+    
+    return parallel_hits, parallel_articles[:-1] # Last one is empty
 
 
 def get_sentence_dict(original_sentences, embeddings):
@@ -93,7 +95,8 @@ if __name__ == "__main__":
     argument_parser.add_argument("--target-embeddings", help="File of target language sentence embeddings")
     argument_parser.add_argument("--source-sentences", help="Original source language sentences file")
     argument_parser.add_argument("--target-sentences", help="Original target language sentences file")
-    argument_parser.add_argument("--parallel-articles", help="File with parallel source and target articles")
+    argument_parser.add_argument("--parallel-source-articles", help="File with parallel source articles")
+    argument_parser.add_argument("--parallel-target-article", help="File with parallel target articles")
     argument_parser.add_argument("--output", help="Output file")
     arguments = argument_parser.parse_args()
 
@@ -101,7 +104,8 @@ if __name__ == "__main__":
     target_embeddings_file = arguments.target_embeddings
     source_original_file = arguments.source_sentences
     target_original_file = arguments.target_sentences
-    parallel_articles_file = arguments.parallel_articles
+    parallel_source_articles_file = arguments.parallel_source_articles
+    parallel_target_articles_file = arguments.parallel_target_articles
     output = arguments.output
 
     source_original_sentences = read_original_sentences(source_original_file)
@@ -116,11 +120,13 @@ if __name__ == "__main__":
     target_sentence_dict = get_sentence_dict(target_original_sentences, target_embeddings)
     print("Sentence dictionaries created.")
 
-    parallel_articles = read_parallel_articles(parallel_articles_file)
+    parallel_source_hits, parallel_source_articles = read_parallel_articles(parallel_source_articles_file)
+    parallel_target_hits, parallel_target_articles = read_parallel_articles(parallel_target_articles_file)
     print("Parallel articles read.")
-    print("{} parallel articles.".format(len(parallel_articles))) 
+    print("{} parallel articles.".format(len(parallel_source_articles))) 
     print("Calculating cosine similarities...")
     start = time.time()
+    # TODO
     max_cosines = get_max_cosines_in_articles(parallel_articles, \
                                               source_sentence_dict, \
                                               target_sentence_dict, \
