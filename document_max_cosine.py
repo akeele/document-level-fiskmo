@@ -177,7 +177,7 @@ if __name__ == "__main__":
                                                                       source_embeddings, \
                                                                       target_embeddings, \
                                                                       source_parallel_dict, \
-                                                                      target_parallel_dict):
+                                                                      target_parallel_dict)
 
     end = time.time()
     print("Cosine calculations took {:.4f} seconds".format(end - start))
