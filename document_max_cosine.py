@@ -70,6 +70,7 @@ def get_max_cosines_in_articles(source_parallel_articles, \
     all_parallel_articles_and_margin_scores = []
     source_errors = 0
     target_errors = 0
+    hit_errors = 0
     for source_article, hits in source_parallel_dict.items():
         source_article_sentences = source_article.strip().split("\n")
         source_indices = []
@@ -81,11 +82,18 @@ def get_max_cosines_in_articles(source_parallel_articles, \
                 continue
 
         target_hit_articles = []
+        is_hit_error = False
         for hit in hits:
-            hit_articles = target_parallel_dict[hit]
-            target_hit_articles += hit_articles
+            try:
+                hit_articles = target_parallel_dict[hit]
+                target_hit_articles += hit_articles
+            except KeyError:
+                hit_errors += 1
+                is_hit_error = True
+                continue
+        if is_hit_error:
+            continue
         target_hit_articles = list(set(target_hit_articles))
-        
         target_hit_articles_max_cosines = []
         for target_hit_article in target_hit_articles:
             target_hit_article_sentences = target_hit_article.strip().split("\n")
@@ -105,13 +113,18 @@ def get_max_cosines_in_articles(source_parallel_articles, \
             target_hit_articles_max_cosines.append((target_hit_article, numpy.mean(max_sentence_cosines)))
 
         target_hit_articles_max_cosines.sort(key=lambda tup: tup[1], reverse=True)
-        margin_score = target_hit_articles_max_cosines[0][1] / numpy.mean(target_hit_articles_max_cosines[1:][1])
-        
+        if len(target_hit_articles) > 1:
+            worse_cosines = [item[1] for item in target_hit_articles_max_cosines[1:]]
+            margin_score = target_hit_articles_max_cosines[0][1] / numpy.mean(worse_cosines)
+        else:
+            margin_score = target_hit_articles_max_cosines[0][1]
+
         parallel_articles_and_margin_score = (source_article, target_hit_articles_max_cosines[0][0], margin_score)
         all_parallel_articles_and_margin_scores.append(parallel_articles_and_margin_score)
 
     print("Source key errors: ", source_errors)
     print("Target key errors: ", target_errors)
+    print("Hit errors: ", hit_errors)
     return all_parallel_articles_and_margin_scores
 
 def sort_parallel_articles(parallel_articles_and_scores):
@@ -124,7 +137,7 @@ def write_to_output_file(sorted_parallel_articles, output_file):
             print(parallel_article[0], file=output)
             print("@@@", file=output)
             print(parallel_article[1], file=output)
-            print("|||")
+            print("|||", file=output)
 
 
 if __name__ == "__main__":
@@ -185,5 +198,4 @@ if __name__ == "__main__":
     sorted_parallel_articles = sort_parallel_articles(parallel_articles_and_margin_scores)
     
     print("Writing results to file...")
-    print(sorted_parallel_articles[:10][2])
     write_to_output_file(sorted_parallel_articles, output)
