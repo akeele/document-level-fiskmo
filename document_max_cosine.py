@@ -102,7 +102,7 @@ def get_max_cosines_in_articles(source_parallel_articles, \
         
             cosine_matrix = numpy.dot(normalize(source_matrix, axis=1), normalize(target_matrix, axis=1).T)
             max_sentence_cosines = numpy.amax(cosine_matrix, axis=1)
-            target_hit_articles_max_cosines.append(target_hit_article, numpy.mean(max_sentence_cosines))
+            target_hit_articles_max_cosines.append((target_hit_article, numpy.mean(max_sentence_cosines)))
 
         target_hit_articles_max_cosines.sort(key=lambda tup: tup[1], reverse=True)
         margin_score = target_hit_articles_max_cosines[0][1] / numpy.mean(target_hit_articles_max_cosines[1:][1])
