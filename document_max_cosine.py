@@ -170,8 +170,8 @@ if __name__ == "__main__":
     print("Calculating cosine similarities...")
     start = time.time()
     # TODO
-    parallel_articles_and_margin_scores = get_max_cosines_in_articles(source_parallel_articles, \
-                                                                      target_parallel_articles, \
+    parallel_articles_and_margin_scores = get_max_cosines_in_articles(parallel_source_articles, \
+                                                                      parallel_target_articles, \
                                                                       source_sentence_dict, \
                                                                       target_sentence_dict, \
                                                                       source_embeddings, \
