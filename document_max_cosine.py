@@ -162,8 +162,8 @@ if __name__ == "__main__":
     parallel_source_hits, parallel_source_articles = read_parallel_articles(parallel_source_articles_file)
     parallel_target_hits, parallel_target_articles = read_parallel_articles(parallel_target_articles_file)
     
-    source_parallel_dict = create_parallel_dict(parallel_source_articles, parallel_source_hits, keys="hits")
-    target_parallel_dict = create_parallel_dict(parallel_target_articles, parallel_target_hits, keys="articles")
+    source_parallel_dict = create_parallel_dict(parallel_source_articles, parallel_source_hits, keys="articles")
+    target_parallel_dict = create_parallel_dict(parallel_target_articles, parallel_target_hits, keys="hits")
 
     print("Parallel articles read.")
     print("{} parallel articles.".format(len(parallel_source_articles))) 
