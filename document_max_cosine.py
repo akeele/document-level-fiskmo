@@ -5,6 +5,7 @@ import operator
 from sklearn.preprocessing import normalize
 import argparse
 import time
+from collections import Counter
 
 
 DIMENSIONS = 1024
@@ -24,7 +25,6 @@ def read_original_sentences(original_sentence_file):
     original_sentences = [sentence.strip() for sentence in original_sentences]
     return original_sentences
 
-# TODO 
 def read_parallel_articles(parallel_articles_file):
     with open(parallel_articles_file, "rt") as f:
         parallel_articles = f.read()
@@ -68,6 +68,7 @@ def get_max_cosines_in_articles(source_parallel_articles, \
                                 target_parallel_dict):
 
     all_parallel_articles_and_margin_scores = []
+    list_of_parallel_target_articles_per_source = []
     source_errors = 0
     target_errors = 0
     hit_errors = 0
@@ -94,6 +95,9 @@ def get_max_cosines_in_articles(source_parallel_articles, \
         if is_hit_error:
             continue
         target_hit_articles = list(set(target_hit_articles))
+        if len(target_hit_articles) < 2:
+            continue
+        list_of_parallel_target_articles_per_source.append(len(target_hit_articles))
         target_hit_articles_max_cosines = []
         for target_hit_article in target_hit_articles:
             target_hit_article_sentences = target_hit_article.strip().split("\n")
@@ -125,6 +129,7 @@ def get_max_cosines_in_articles(source_parallel_articles, \
     print("Source key errors: ", source_errors)
     print("Target key errors: ", target_errors)
     print("Hit errors: ", hit_errors)
+    print(Counter(list_of_parallel_target_articles_per_source))
     return all_parallel_articles_and_margin_scores
 
 def sort_parallel_articles(parallel_articles_and_scores):
@@ -182,7 +187,6 @@ if __name__ == "__main__":
     print("{} parallel articles.".format(len(parallel_source_articles))) 
     print("Calculating cosine similarities...")
     start = time.time()
-    # TODO
     parallel_articles_and_margin_scores = get_max_cosines_in_articles(parallel_source_articles, \
                                                                       parallel_target_articles, \
                                                                       source_sentence_dict, \
