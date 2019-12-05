@@ -20,7 +20,7 @@ def read_embeddings(embeddings_file, n):
     return embeddings
 """
 def read_original_sentences(original_sentence_file):
-    with open(original_sentence_file, "rt") as f:
+    with gzip.open(original_sentence_file, "rt") as f:
         original_sentences = f.readlines()
     original_sentences = [sentence.strip() for sentence in original_sentences]
     return original_sentences
@@ -111,9 +111,13 @@ def get_max_cosines_in_articles(source_parallel_articles, \
         
             source_matrix = source_embeddings[source_indices]
             target_matrix = target_embeddings[target_indices]
-        
+            
             cosine_matrix = numpy.dot(normalize(source_matrix, axis=1), normalize(target_matrix, axis=1).T)
-            max_sentence_cosines = numpy.amax(cosine_matrix, axis=1)
+            if cosine_matrix.shape[0] < cosine_matrix.shape[1]: 
+                max_sentence_cosines = numpy.amax(cosine_matrix, axis=0)
+            else:
+                max_sentence_cosines = numpy.amax(cosine_matrix, axis=1)
+
             target_hit_articles_max_cosines.append((target_hit_article, numpy.mean(max_sentence_cosines)))
 
         target_hit_articles_max_cosines.sort(key=lambda tup: tup[1], reverse=True)
@@ -139,6 +143,7 @@ def sort_parallel_articles(parallel_articles_and_scores):
 def write_to_output_file(sorted_parallel_articles, output_file):
     with open(output_file, "wt") as output:
         for parallel_article in sorted_parallel_articles:
+            print(parallel_article[2], file=output)
             print(parallel_article[0], file=output)
             print("@@@", file=output)
             print(parallel_article[1], file=output)
